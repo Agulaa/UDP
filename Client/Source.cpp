@@ -3,7 +3,7 @@
 #include<string>
 #include<map>
 #include<vector>
-
+#include<algorithm>
 #include <WinSock2.h>
 #include <WS2tcpip.h>
 
@@ -17,7 +17,7 @@ int main(){
 	WORD DllVersion = MAKEWORD(2, 2);
 	SOCKADDR_IN address;
 	
-	SOCKET serverSocket, clientSocket;
+	SOCKET clientSocket;
 	int sendsize = 512;
 	char sendbuffer[512];
 	int recevsize = 1024;
@@ -48,7 +48,7 @@ int main(){
 	}
 
 	for (int i = line.length();i < sendsize; i++){
-		sendbuffer[i] = '#';
+		sendbuffer[i] = '\0'; 
 	}
 	if (sendto(clientSocket, sendbuffer, sendsize, 0, (SOCKADDR*)&address, addrlen) == SOCKET_ERROR){
 		std::cout << "Client send error" << std::endl; 
@@ -59,12 +59,11 @@ int main(){
 		std::cout << "Client recv error" << std::endl;
 		exit(1);
 	}
-	std::cout << "Text from server: ";
-	for (int i = 0; i < recevsize; i++){
-		if (recevbuffer[i] != '#'){
-			std::cout << recevbuffer[i];
-		}
+	else{
+		std::cout << "Text from server: ";
+		puts(recevbuffer);
 	}
+	
 	shutdown(clientSocket, SD_BOTH); 
 	closesocket(clientSocket); 
 

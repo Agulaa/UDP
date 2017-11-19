@@ -47,24 +47,21 @@ int main(){
 		result = recvfrom(serverSocket, recevbuffer, recvsize, 0, (SOCKADDR*)&addrClient, &sizeFromClient);
 		if (result > 0){
 			std::cout << "Text from client: ";
-			for (int i = 0; i < recvsize; i++){
-				if (recevbuffer[i] != '#'){
-					std::cout << recevbuffer[i];
-				}
-			}
+			puts(recevbuffer); 
 			// zliczanie liter w teksie 
 			for (int i = 0; i < recvsize; i++){
-				auto it = counterLetter.find(recevbuffer[i]);
-
-				if (it == counterLetter.end()){
-					if (recevbuffer[i] != ' '){
-						counterLetter.emplace(recevbuffer[i], 1);
+				if (recevbuffer[i] != '\0'){
+					auto it = counterLetter.find(recevbuffer[i]);
+					if (it == counterLetter.end()){
+						if (recevbuffer[i] != 32 && recevbuffer[i] != 10 && recevbuffer[i] != 13 && recevbuffer[i] != 1){
+							counterLetter.emplace(recevbuffer[i], 1);
+						}
 					}
-				}
-				else{
-					if (recevbuffer[i] != ' '){
-						counterLetter[recevbuffer[i]]++;
-					}
+					else{
+						if (recevbuffer[i] != 32 && recevbuffer[i] != 10 && recevbuffer[i] != 13 && recevbuffer[i] != 1){
+							counterLetter[recevbuffer[i]]++;
+							}
+						}
 				}
 			}
 			// uzuplnianie nowej tablicy
@@ -74,19 +71,17 @@ int main(){
 				helpVector.push_back(it->first);
 				helpVector.push_back(it->second + 48);
 			}
-			int j = 0;
-			for (auto x : helpVector){
-				if (x != 0){
-					sendbuffer[j] = x;
-					j++;
-				}
+			
+			for (int i = 0; i < helpVector.size(); i++){
+				sendbuffer[i] = helpVector[i]; 
 			}
 			for (int i = helpVector.size(); i < sendsize; i++){
-				sendbuffer[i] = '#';
+				sendbuffer[i] = '\0'; 
 			}
+			puts(sendbuffer); 
 
 			sendto(serverSocket, sendbuffer, sendsize, 0, (SOCKADDR*)&addrClient, sizeFromClient);
-			}else{
+		}else{
 		std::cout << "Error with recvfrom" << std::endl;
 		}
 
